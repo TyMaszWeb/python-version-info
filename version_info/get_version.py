@@ -1,3 +1,5 @@
+import collections
+
 import git
 
 import version_info.exceptions
@@ -7,6 +9,9 @@ __all__ = (
     'get_git_version',
     'find_versions',
 )
+
+
+VersionSpec = collections.namedtuple('VersionSpec', ('name', 'tag', 'commit'))
 
 
 def get_git_version(path):
@@ -51,4 +56,4 @@ def find_versions(repo_list):
             version_func = GET_VERSION_MAPPING[vcs_type_normalized]
         except KeyError as exc:
             raise version_info.exceptions.VCSNotSupported(exc.args[0])
-        yield (name,) + version_func(path)
+        yield VersionSpec(name, *version_func(path))
