@@ -11,19 +11,16 @@ __all__ = (
 )
 
 
+VersionSpec = collections.namedtuple('VersionSpec', ['tag', 'commit'])
+
+
 def get_git_version(path):
     repo = git.Repo(path)
     head_commit = repo.head.ref.commit
     for tag in repo.tags:
         if tag.commit == head_commit:
-            return {
-                'tag': tag.name,
-                'commit': head_commit.hexsha
-            }
-    return {
-        'tag': None,
-        'commit': head_commit.hexsha
-    }
+            return VersionSpec(tag.name, head_commit.hexsha)
+    return VersionSpec(None, head_commit.hexsha)
 
 
 GET_VERSION_MAPPING = {
@@ -40,26 +37,34 @@ def find_versions(repo_list):
 
     Where:
 
-    * reference_name can be anything and it will be yielded back in name
+    * first element can be anything and it will be yielded back as the first
+      tuple element
 
     * second element is either:
 
         *  the VCS type as string;
            for a list of supported VCS's see README.rst
 
-        *  a callable that will receive path and returns a dict
-           containing virtually any values, except for 'name' and
-           reserved Python words such as def or class
+        *  a callable that will receive path and returns any object,
+           but a namedtuple similar to VersionSpec is encouraged
 
-    You receive a list of namedtuples:
+    * third element is the path to the repository root or in case of
+      custom callables any value that can explicitly define your repo
 
-        [
-            (name='reference_name', tag='1.0', commit='fb666d55d3')
-            (name='reference_name', dict_value_one=1, dict_value_two=2)
-        ]
+    You receive a generator where each element is a tuple of:
+
+        ('repo_one', VersionSpec(tag='1.0', commit='fb666d55d3'))
+
+    Casting the generator to a dictionary you can easily easily pass the
+    version specs to your template engine:
+
+        {
+            'repo_one': VersionSpec(tag='1.0', commit='fb666d55d3'),
+            'repo_two': CustomVersionSpec(version=(1,0,0))
+        }
 
     :param repo_list: list of tuples as specified
-    :return: list of namedtuples
+    :return: generator of (name, VersionSpec) tuples
     """
     for name, vcs_type, path in repo_list:
         if callable(vcs_type):
@@ -70,9 +75,4 @@ def find_versions(repo_list):
                 version_func = GET_VERSION_MAPPING[vcs_type_normalized]
             except KeyError as exc:
                 raise version_info.exceptions.VCSNotSupported(exc.args[0])
-        version_spec = version_func(path)
-        version_spec_keys = ['name', ] + version_spec.keys()
-        version_spec_values = [name, ] + version_spec.values()
-        version_spec_class = collections.namedtuple('VersionSpec',
-                                                    version_spec_keys)
-        yield version_spec_class(*version_spec_values)
+        yield name, version_func(path)
