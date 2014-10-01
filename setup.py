@@ -3,8 +3,6 @@
 import os
 import setuptools
 
-import version_info
-
 
 def read_from_root(name):
     return open(os.path.join(os.path.dirname(__file__), name)).read()
@@ -24,7 +22,7 @@ setuptools.setup(
     author='Piotr Kilczuk',
     author_email='piotr@tymaszweb.pl',
     name='python-version-info',
-    version='.'.join(str(v) for v in version_info.VERSION),
+    version='0.0.4',
     description='Easy way to find out and display VCS versions of your projects',
     long_description=read_from_root('README.rst'),
     url='https://github.com/TyMaszWeb/python-version-info',
