@@ -22,7 +22,7 @@ setuptools.setup(
     author='Piotr Kilczuk',
     author_email='piotr@tymaszweb.pl',
     name='python-version-info',
-    version='0.0.4',
+    version='0.0.5',
     description='Easy way to find out and display VCS versions of your projects',
     long_description=read_from_root('README.rst'),
     url='https://github.com/TyMaszWeb/python-version-info',
@@ -32,6 +32,6 @@ setuptools.setup(
     install_requires=read_from_root('requirements.txt').split(),
     tests_require=read_from_root('test-requirements.txt').split(),
     packages=setuptools.find_packages(),
-    include_package_data=False,
+    include_package_data=True,
     # test_suite='runtests.main',
 )
