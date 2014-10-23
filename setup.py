@@ -22,7 +22,7 @@ setuptools.setup(
     author='Piotr Kilczuk',
     author_email='piotr@tymaszweb.pl',
     name='python-version-info',
-    version='0.0.5',
+    version='0.0.6',
     description='Easy way to find out and display VCS versions of your projects',
     long_description=read_from_root('README.rst'),
     url='https://github.com/TyMaszWeb/python-version-info',
